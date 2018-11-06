@@ -30,13 +30,13 @@ var configurations = [
         // Then we parse it
         data = JSON.parse(data);
         data.forEach(function(event) {
-          var reason = event['$properties']['Reason'];
-          var type = event['$properties']['Type'];
+          var reason = event['$properties']['$Reason'];
+          var type = event['$properties']['$Type'];
           var payload = {              
             attachments: [
               {
-                fallback: reason+ ": " + type,
-                text: reason+ ": " + type,
+                fallback: reason + ": " + type,
+                text: reason + ": " + type,
                 color: "#d17c88"
               }
             ],
