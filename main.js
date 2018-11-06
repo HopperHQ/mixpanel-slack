@@ -20,8 +20,8 @@ app.use (function(req, res, next) {
 // Setup the configurations
 var configurations = [
   {
-    requestUrl: '/mixpanel/RunCustomSetup',
-    postUrl: 'https://hooks.slack.com/services/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',
+    requestUrl: '/mixpanel',
+    postUrl: process.env.SLACK_WEBHOOK_URL,
     formatter: function(data) {
       var ret = [];
       try {
@@ -30,90 +30,14 @@ var configurations = [
         // Then we parse it
         data = JSON.parse(data);
         data.forEach(function(event) {
-          var id = event['$distinct_id'];
-          var name = event['$properties']['$name'];
-          var message = "@gabriel\n" + name + " clicked the RunCustomSetup button\n<" +
-              "https://mixpanel.com/report/270423/explore/#user?distinct_id=" + id +
-              "| View in Mixpanel>";
-          var payload = {
-            text: message,
-            icon_emoji: ":monkey:",
-            username: "Mixpanel"
-          };
-          ret.push(payload);
-        });
-      } catch(error) {
-        console.error('Failed to process data');
-        console.error(error);
-      }
-      return ret;
-    }
-  }, {
-    requestUrl: '/mixpanel/CustomEvent',
-    postUrl: 'https://hooks.slack.com/services/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',
-    formatter: function(data, url) {
-      var ret = [];
-      var eventName = url.split('/');
-      eventName = eventName[eventName.length - 1];
-      try {
-        // First we need to format the mixpanel data
-        data = decodeURIComponent(data).substr(6).replace(/\+/g,' ');
-        // Then we parse it
-        data = JSON.parse(data);
-        data.forEach(function(event) {
-          var id = event['$distinct_id'];
-          var name = event['$properties']['$name'];
-          var message = "@gabriel\n" + name + " clicked the '" + eventName + "' button\n<" +
-              "https://mixpanel.com/report/270423/explore/#user?distinct_id=" + id +
-              "| View in Mixpanel>";
-          var payload = {
-            text: message,
-            icon_emoji: ":omg-panda:",
-            username: "Mixpanel"
-          };
-          ret.push(payload);
-        });
-      } catch(error) {
-        console.error('Failed to process data');
-        console.error(error);
-      }
-      return ret;
-    }
-  }, {
-    requestUrl: '/mixpanel/signup',
-    postUrl: 'https://hooks.slack.com/services/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',
-    formatter: function(data) {
-      var ret = [];
-      try {
-        // First we need to format the mixpanel data
-        data = decodeURIComponent(data).substr(6).replace(/\+/g,' ');
-        // Then we parse it
-        data = JSON.parse(data);
-        data.forEach(function(event) {
-          var id = event['$distinct_id'];
-          var name = event['$properties']['$name'];
-          var org = event['$properties']['org'];
-          var phone = event['$properties']['phone'];
-          var timezone = event['$properties']['$timezone'];
+          var reason = event['$properties']['Reason'];
+          var type = event['$properties']['Type'];
           var payload = {              
             attachments: [
               {
-                fallback: name + " @ " + org + " just signed up",
-                text: name + " @ " + org + " just signed up" +
-                  "\n<https://mixpanel.com/report/270423/explore/#user?distinct_id=" + id +
-                  "| View in Mixpanel>",
-                fields: [
-                  {
-                    title: 'Phone',
-                    value: phone,
-                    short: true
-                  },{
-                    title: 'Timezone',
-                    value: timezone,
-                    short: true
-                  }
-                ],
-                color: "#7CD197"
+                fallback: reason+ ": " + type,
+                text: reason+ ": " + type,
+                color: "#d17c88"
               }
             ],
             icon_emoji: ":moneybag:",
